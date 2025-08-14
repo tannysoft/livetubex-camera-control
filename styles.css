@@ -2,11 +2,13 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #282828;
+    font-family: 'Montserrat', sans-serif;
+    background: #1a1a1a;
     color: #ffffff;
     min-height: 100vh;
 }
@@ -25,10 +27,10 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: #444444;
+    background: #3a3a3a;
     padding: 8px 15px;
     border-radius: 8px;
-    border: 1px solid #555555;
+    border: 1px solid #4a4a4a;
 }
 
 .status-indicator {
@@ -64,12 +66,12 @@ body {
 }
 
 .control-section {
-    background: #333333;
+    background: #2a2a2a;
     border-radius: 15px;
     padding: 25px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     width: 100%;
-    border: 1px solid #444444;
+    border: 1px solid #3a3a3a;
 }
 
 .control-header {
@@ -149,7 +151,7 @@ body {
 }
 
 .stop-btn {
-    background: #444444;
+    background: #3a3a3a;
     color: white;
     border: 1px solid #555555;
 }
@@ -172,15 +174,13 @@ body {
     gap: 20px;
     width: 100%;
     margin: 0 auto;
-    max-width: 600px;
     text-align: center;
 }
 
 .status-item {
-    background: #444444;
+    background: #3a3a3a;
     padding: 15px;
     border-radius: 10px;
-    border-left: 4px solid #4682B4;
 }
 
 .status-label {
@@ -201,7 +201,7 @@ body {
 .format-section {
     margin-top: 25px;
     padding-top: 25px;
-    border-top: 2px solid #555555;
+    border-top: 2px solid #4a4a4a;
 }
 
 .format-section h3 {
@@ -231,9 +231,8 @@ body {
     display: flex;
     justify-content: space-between;
     padding: 12px;
-    background: #444444;
+    background: #3a3a3a;
     border-radius: 8px;
-    border-left: 3px solid #FF8C00;
 }
 
 .format-label {
