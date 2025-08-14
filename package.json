@@ -1,0 +1,34 @@
+{
+  "name": "blackmagic-ursa-dashboard",
+  "version": "1.0.0",
+  "description": "Dashboard สำหรับควบคุมกล้อง Blackmagic URSA Broadcast G2",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "dev": "python3 -m http.server 8000",
+    "serve": "python3 -m http.server 8000"
+  },
+  "keywords": [
+    "blackmagic",
+    "ursa",
+    "camera",
+    "control",
+    "dashboard",
+    "broadcast"
+  ],
+  "author": "Camera Control Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/blackmagic-ursa-dashboard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/blackmagic-ursa-dashboard/issues"
+  },
+  "homepage": "https://github.com/yourusername/blackmagic-ursa-dashboard#readme",
+  "devDependencies": {},
+  "dependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+} 
