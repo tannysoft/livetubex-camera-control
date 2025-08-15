@@ -1,93 +1,169 @@
-# Blackmagic URSA Broadcast G2 Camera Control Dashboard
+# Camera Control Dashboard - Vue.js 3 + Tailwind CSS
 
-Dashboard สำหรับควบคุมกล้อง Blackmagic URSA Broadcast G2 ผ่านเครือข่าย IP
+A modern, responsive dashboard for controlling Blackmagic cameras using Vue.js 3 and Tailwind CSS.
 
-## คุณสมบัติ
+## ✨ Features
 
-- **การควบคุมการบันทึก**: Start/Stop Recording
-- **การแสดงสถานะ**: Record Status, Recording Time, Connection Status
-- **ข้อมูลรูปแบบการบันทึก**: Codec, Frame Rate, Resolution, Off Speed
-- **ข้อมูล Timecode**: Current Timecode (แปลงจาก BCD เป็นรูปแบบ HH:MM:SS:FF)
-- **Auto-Connect**: เชื่อมต่ออัตโนมัติและอัปเดตข้อมูลทุก 5 วินาที
-- **Real-time Status Monitoring**: ตรวจสอบสถานะกล้องทุก 2 วินาที
-- **Auto-Reconnection**: เชื่อมต่อใหม่อัตโนมัติเมื่อการเชื่อมต่อขาดหาย
-- **Fast Offline Detection**: ตรวจจับการขาดการเชื่อมต่อภายใน 3 วินาที
-- **Responsive Design**: รองรับการใช้งานบนอุปกรณ์ต่างๆ
+- **Real-time WebSocket connections** to multiple cameras
+- **Auto-restart recording** when cameras stop unexpectedly
+- **Responsive design** with Tailwind CSS
+- **Modern Vue.js 3** Composition API
+- **Pinia state management** for clean architecture
+- **Real-time updates** for timecode, format, and status
 
-## การติดตั้ง
+## 🚀 Tech Stack
 
-1. ดาวน์โหลดไฟล์ทั้งหมดไปยังโฟลเดอร์เดียวกัน
-2. เปิดไฟล์ `index.html` ในเว็บเบราว์เซอร์
-3. Dashboard จะเชื่อมต่ออัตโนมัติกับกล้องที่ IP 192.168.8.202 ภายใน 1 วินาที
-4. ข้อมูลจะอัปเดตทุก 5 วินาทีโดยอัตโนมัติ
+- **Frontend**: Vue.js 3 (Composition API)
+- **Styling**: Tailwind CSS
+- **Build Tool**: Vite
+- **State Management**: Pinia
+- **Font**: Montserrat (Google Fonts)
 
-## การใช้งาน
+## 📦 Installation
 
-### การเชื่อมต่อ
-- Dashboard จะเชื่อมต่ออัตโนมัติกับกล้องที่ IP 192.168.8.202
-- สถานะการเชื่อมต่อจะแสดงเป็นสีเขียวเมื่อเชื่อมต่อสำเร็จ
-- มีการเชื่อมต่อใหม่อัตโนมัติเมื่อการเชื่อมต่อขาดหาย
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-### การบันทึก
-- กดปุ่ม "Record" เพื่อเริ่มบันทึก (ส่ง `PUT {"recording": true}`)
-- กดปุ่ม "Stop" เพื่อหยุดบันทึก (ส่ง `PUT {"recording": false}`)
-- Clip Timecode จะแสดงในรูปแบบ HH:MM:SS:FF
-- สถานะการบันทึกจะอัปเดตจาก API `GET /control/api/v1/transports/0/record`
+2. **Start development server:**
+   ```bash
+   npm run dev
+   ```
 
+3. **Build for production:**
+   ```bash
+   npm run build
+   ```
 
+4. **Preview production build:**
+   ```bash
+   npm run preview
+   ```
 
-## API Endpoints
+## 🔧 Configuration
 
-Dashboard นี้ใช้ API endpoints ต่อไปนี้:
+### Camera IP Addresses
 
-- `GET /control/api/v1/control/api/v1` - ตรวจสอบสถานะการเชื่อมต่อ (Status Check)
-- `GET /control/api/v1/system/format` - ข้อมูลรูปแบบการบันทึก (Codec, Frame Rate, Resolution)
-- `GET /control/api/v1/transports/0/timecode` - ข้อมูล Timecode ปัจจุบัน (แปลงจาก BCD เป็นรูปแบบ HH:MM:SS:FF)
-- `GET /control/api/v1/transports/0/record` - สถานะการบันทึก
-- `PUT /control/api/v1/transports/0/record` - ควบคุมการบันทึก (recording: true/false)
+Edit `src/stores/cameraStore.js` to configure camera IP addresses:
 
-## ข้อกำหนดระบบ
+```javascript
+const cameras = reactive({
+  camera1: {
+    id: 'camera1',
+    ip: '192.168.8.201',  // Change this IP
+    // ... other properties
+  },
+  // ... other cameras
+})
+```
 
-- เว็บเบราว์เซอร์ที่รองรับ ES6+ (Chrome, Firefox, Safari, Edge)
-- การเชื่อมต่อเครือข่ายกับกล้อง
-- กล้องต้องเปิดใช้งาน Network Control
+### WebSocket Endpoints
 
-## การแก้ไขปัญหา
+The dashboard connects to cameras via WebSocket at:
+```
+ws://{CAMERA_IP}/control/api/v1/event/websocket
+```
 
-### ไม่สามารถเชื่อมต่อได้
-1. ตรวจสอบ IP Address ของกล้อง
-2. ตรวจสอบการเชื่อมต่อเครือข่าย
-3. ตรวจสอบว่า Network Control เปิดใช้งานบนกล้อง
+## 🎯 Usage
 
-### การบันทึกไม่ทำงาน
-1. ตรวจสอบสถานะการเชื่อมต่อ
-2. ตรวจสอบการตั้งค่ากล้อง
-3. ตรวจสอบ Activity Log สำหรับข้อผิดพลาด
+1. **Connect to cameras** - WebSocket connections are established automatically
+2. **Monitor status** - Real-time connection and recording status
+3. **Control recording** - Start/stop recording for each camera
+4. **View format info** - Codec, frame rate, resolution, device name
+5. **Monitor timecode** - Real-time clip timecode display
 
-## การพัฒนา
+## 📱 Responsive Design
 
-Dashboard นี้สร้างด้วย:
-- HTML5
-- CSS3 (with Flexbox and Grid)
-- Vanilla JavaScript (ES6+)
-- Font Awesome Icons
+- **Desktop (≥1201px)**: 3 columns layout
+- **Tablet (769px-1200px)**: 2 columns layout  
+- **Mobile (≤768px)**: 1 column layout
 
-## การปรับแต่ง
+## 🎨 Customization
 
-คุณสามารถปรับแต่ง Dashboard ได้โดย:
-- แก้ไขไฟล์ `styles.css` สำหรับการออกแบบ
-- แก้ไขไฟล์ `script.js` สำหรับฟังก์ชันการทำงาน
-- เพิ่ม API endpoints ใหม่ใน `script.js`
+### Colors
 
-## การสนับสนุน
+Edit `tailwind.config.js` to customize the color scheme:
 
-หากพบปัญหาหรือต้องการความช่วยเหลือ กรุณาตรวจสอบ:
-1. Activity Log ใน Dashboard
-2. Console ของเว็บเบราว์เซอร์
-3. การตั้งค่าเครือข่ายของกล้อง
+```javascript
+colors: {
+  'camera-red': '#FF0000',
+  'camera-orange': '#FF8C00',
+  'camera-green': '#27ae60',
+  'camera-dark': '#1a1a1a',
+  'camera-card': '#2a2a2a',
+  'camera-element': '#3a3a3a',
+  'camera-border': '#4a4a4a'
+}
+```
 
-## หมายเหตุ
+### Animations
 
-- Dashboard นี้ใช้สำหรับการควบคุมกล้องผ่านเครือข่าย IP เท่านั้น
-- ต้องมีการตั้งค่าเครือข่ายที่ถูกต้อง
-- แนะนำให้ใช้ในเครือข่ายที่ปลอดภัย 
+Custom animations are defined in `tailwind.config.js`:
+
+- `recording-pulse`: Button pulse animation
+- `recording-gradient`: Gradient animation
+- `recording-item-pulse`: Status item pulse
+
+## 🔌 API Endpoints
+
+### Camera Control
+- `PUT /control/api/v1/transports/0/record` - Start/stop recording
+
+### Camera Data
+- `GET /control/api/v1/system/format` - Camera format information
+- `GET /control/api/v1/transports/0/timecode` - Timecode data
+- `GET /control/api/v1/media/active` - Device information
+
+## 🚨 Auto-restart Feature
+
+The dashboard automatically restarts recording when:
+- Camera stops recording unexpectedly
+- Network connection is restored
+- WebSocket reconnects
+
+**Note**: Manual stops (via Stop button) do not trigger auto-restart.
+
+## 📁 Project Structure
+
+```
+src/
+├── components/
+│   └── CameraCard.vue          # Individual camera component
+├── stores/
+│   └── cameraStore.js          # Pinia store for camera state
+├── App.vue                     # Main application component
+├── main.js                     # Application entry point
+└── style.css                   # Global styles and Tailwind imports
+```
+
+## 🐛 Troubleshooting
+
+### WebSocket Connection Issues
+- Check camera IP addresses
+- Verify network connectivity
+- Check camera WebSocket endpoint availability
+
+### Build Issues
+- Ensure Node.js version ≥16
+- Clear `node_modules` and reinstall dependencies
+- Check Vite configuration
+
+## 📄 License
+
+MIT License - see LICENSE file for details.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📞 Support
+
+For issues and questions:
+- Create an issue in the repository
+- Check the troubleshooting section
+- Review the API documentation 
