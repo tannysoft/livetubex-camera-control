@@ -83,6 +83,7 @@ const cameras = {
             recordStatus: 'record-status-5',
             currentTimecode: 'current-timecode-5',
             codecValue: 'codec-value-5',
+            frameRateValue: 'frame-rate-value-5',
             resolutionValue: 'resolution-value-5',
             deviceNameValue: 'device-name-value-5'
         }
@@ -408,7 +409,7 @@ function updateCameraFormat(cameraId, data) {
     
     // Update Codec
     if (data.codec && codecValue) {
-        codecValue.textContent = data.codec;
+        codecValue.textContent = data.codec.toUpperCase().replace(":"," ").replace("_",":");
     } else if (codecValue) {
         codecValue.textContent = 'N/A';
     }
