@@ -49,7 +49,7 @@
     </div>
 
     <!-- Status Display -->
-    <div class="grid grid-cols-2 gap-4 mb-6">
+    <div class="grid grid-cols-2 gap-4 mb-4">
       <div 
         :class="[
           'flex items-center justify-between p-4 rounded-lg transition-all duration-300',
