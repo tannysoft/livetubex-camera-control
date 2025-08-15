@@ -5,6 +5,7 @@ const cameras = {
         ip: '192.168.8.201',
         connected: false,
         recording: false,
+        manualStop: false,
         ws: null,
         propertyData: {},
         availableProperties: [],
@@ -26,6 +27,7 @@ const cameras = {
         ip: '192.168.8.202',
         connected: false,
         recording: false,
+        manualStop: false,
         ws: null,
         propertyData: {},
         availableProperties: [],
@@ -47,6 +49,7 @@ const cameras = {
         ip: '192.168.8.203',
         connected: false,
         recording: false,
+        manualStop: false,
         ws: null,
         propertyData: {},
         availableProperties: [],
@@ -68,6 +71,7 @@ const cameras = {
         ip: '192.168.8.205',
         connected: false,
         recording: false,
+        manualStop: false,
         ws: null,
         propertyData: {},
         availableProperties: [],
@@ -200,22 +204,29 @@ function updateUIFromPropertyData(cameraId) {
     const camera = cameras[cameraId];
     if (!camera) return;
     
-    // Update recording status
-    if (camera.propertyData['/transports/0/record']) {
-        const recordData = camera.propertyData['/transports/0/record'];
-        if (recordData.recording !== camera.recording) {
-            camera.recording = recordData.recording;
-            updateRecordingUI(cameraId);
-        }
-    }
+                    // Update recording status
+                if (camera.propertyData['/transports/0/record']) {
+                    const recordData = camera.propertyData['/transports/0/record'];
+                    if (recordData.recording !== camera.recording) {
+                        const wasRecording = camera.recording;
+                        camera.recording = recordData.recording;
+                        updateRecordingUI(cameraId);
+                        
+                                        // Auto-restart recording if it was stopped (but not manually)
+                if (wasRecording && !camera.recording && !camera.manualStop) {
+                    console.log(`Auto-restarting recording for ${cameraId}`);
+                    startRecording(cameraId); // Immediate restart
+                }
+                    }
+                }
     
-    // Update timecode
-    if (camera.propertyData['/transports/0/timecode']) {
-        const timecodeData = camera.propertyData['/transports/0/timecode'];
-        if (timecodeData.timecode !== undefined) {
-            updateTimecode(cameraId, timecodeData);
-        }
-    }
+                    // Update timecode
+                if (camera.propertyData['/transports/0/timecode']) {
+                    const timecodeData = camera.propertyData['/transports/0/timecode'];
+                    if (timecodeData.clip !== undefined) {
+                        updateTimecode(cameraId, timecodeData);
+                    }
+                }
     
     // Update format data
     if (camera.propertyData['/system/format']) {
@@ -289,6 +300,7 @@ async function startRecording(cameraId) {
         
         if (response.ok) {
             camera.recording = true;
+            camera.manualStop = false; // Reset manual stop flag
             updateRecordingUI(cameraId);
         }
     } catch (error) {
@@ -311,7 +323,11 @@ async function stopRecording(cameraId) {
         
         if (response.ok) {
             camera.recording = false;
+            camera.manualStop = true; // Set manual stop flag
             updateRecordingUI(cameraId);
+            
+            // Don't auto-restart after manual stop
+            console.log(`Manual stop for ${cameraId} - no auto-restart`);
         }
     } catch (error) {
         console.error(`Failed to stop recording for ${cameraId}:`, error);
@@ -329,17 +345,32 @@ function updateRecordingUI(cameraId) {
     if (camera.recording) {
         if (recordStatus) {
             recordStatus.textContent = 'Recording';
-            recordStatus.style.color = '#e74c3c';
+            recordStatus.style.color = '#ffffff';
+            // Add recording class to parent status-item
+            const statusItem = recordStatus.closest('.status-item');
+            if (statusItem) {
+                statusItem.classList.add('recording');
+            }
         }
         if (recordBtn) recordBtn.disabled = true;
         if (stopBtn) stopBtn.disabled = false;
     } else {
         if (recordStatus) {
             recordStatus.textContent = 'Stopped';
-            recordStatus.style.color = '#34495e';
+            recordStatus.style.color = '#FF8C00';
+            // Remove recording class from parent status-item
+            const statusItem = recordStatus.closest('.status-item');
+            if (statusItem) {
+                statusItem.classList.remove('recording');
+            }
         }
         if (recordBtn) recordBtn.disabled = false;
         if (stopBtn) stopBtn.disabled = true;
+        
+        // Auto-restart recording only if not manually stopped
+        if (!camera.recording && !camera.manualStop) {
+            autoRestartRecording(cameraId);
+        }
     }
 }
 
@@ -408,8 +439,8 @@ function updateTimecode(cameraId, data) {
     const camera = cameras[cameraId];
     if (!camera) return;
     
-    if (data.timecode !== undefined) {
-        const formattedTimecode = parseTimecode(data.timecode);
+    if (data.clip !== undefined) {
+        const formattedTimecode = parseTimecode(data.clip);
         const currentTimecode = getCameraElement(cameraId, 'currentTimecode');
         if (currentTimecode) {
             currentTimecode.textContent = formattedTimecode;
@@ -456,6 +487,24 @@ function setDefaultValues(cameraId) {
     if (resolutionValue) resolutionValue.textContent = 'Connecting...';
     if (deviceNameValue) deviceNameValue.textContent = 'Connecting...';
     if (currentTimecode) currentTimecode.textContent = '00:00:00:00';
+}
+
+// Auto-restart recording function
+function autoRestartRecording(cameraId) {
+    const camera = cameras[cameraId];
+    if (!camera || camera.recording) return;
+    
+    console.log(`Auto-restarting recording for ${cameraId}`);
+    startRecording(cameraId); // Immediate restart
+}
+
+// Reset manual stop flag function
+function resetManualStop(cameraId) {
+    const camera = cameras[cameraId];
+    if (camera) {
+        camera.manualStop = false;
+        console.log(`Manual stop flag reset for ${cameraId}`);
+    }
 }
 
 // Cleanup WebSocket connections on page unload

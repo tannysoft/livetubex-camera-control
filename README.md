@@ -31,7 +31,7 @@ Dashboard สำหรับควบคุมกล้อง Blackmagic URSA Br
 ### การบันทึก
 - กดปุ่ม "Record" เพื่อเริ่มบันทึก (ส่ง `PUT {"recording": true}`)
 - กดปุ่ม "Stop" เพื่อหยุดบันทึก (ส่ง `PUT {"recording": false}`)
-- Current Timecode จะแสดงในรูปแบบ HH:MM:SS:FF
+- Clip Timecode จะแสดงในรูปแบบ HH:MM:SS:FF
 - สถานะการบันทึกจะอัปเดตจาก API `GET /control/api/v1/transports/0/record`
 
 
