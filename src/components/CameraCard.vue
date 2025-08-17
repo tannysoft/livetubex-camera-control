@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-camera-card rounded-xl p-6 border border-camera-border shadow-lg">
+  <div class="bg-camera-card rounded-xl p-4 border border-camera-border shadow-lg">
     <!-- Header -->
     <div class="flex justify-between items-center mb-2">
       <h1 class="text-2xl font-semibold">{{ camera.id.toUpperCase() }}</h1>
@@ -18,12 +18,12 @@
         </div>
         
         <!-- Control Buttons -->
-        <div class="flex gap-3">
+        <div class="flex gap-2">
           <button
             @click="handleRecordClick"
             :disabled="!camera.connected || camera.recording"
             :class="[
-              'w-11 h-11 rounded-lg flex items-center justify-center text-white font-semibold transition-all duration-300',
+              'w-9 h-9 rounded-lg flex items-center justify-center text-white font-semibold transition-all duration-300',
               camera.recording 
                 ? 'bg-gradient-to-r from-red-500 to-red-700 animate-recording-gradient cursor-not-allowed' 
                 : 'bg-camera-red hover:bg-red-600 hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-xl'
@@ -36,7 +36,7 @@
             @click="handleStopClick"
             :disabled="!camera.connected || !camera.recording"
             :class="[
-              'w-11 h-11 rounded-lg flex items-center justify-center text-white font-semibold transition-all duration-300',
+              'w-9 h-9 rounded-lg flex items-center justify-center text-white font-semibold transition-all duration-300',
               camera.recording 
                 ? 'bg-camera-element hover:bg-gray-600 hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-xl' 
                 : 'bg-gray-500 cursor-not-allowed'
