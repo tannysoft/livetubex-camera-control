@@ -1,7 +1,7 @@
 <template>
   <div class="bg-camera-card rounded-xl p-6 border border-camera-border shadow-lg">
     <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex justify-between items-center mb-2">
       <h1 class="text-2xl font-semibold">{{ camera.id.toUpperCase() }}</h1>
       <div class="flex items-center gap-3">
         <!-- Connection Status -->
@@ -49,10 +49,10 @@
     </div>
 
     <!-- Status Display -->
-    <div class="grid grid-cols-2 gap-4 mb-4">
+    <div class="grid grid-cols-2 gap-2 mb-2">
       <div 
         :class="[
-          'flex items-center justify-between p-4 rounded-lg transition-all duration-300',
+          'flex items-center justify-between p-3 rounded-lg transition-all duration-300',
           camera.recording 
             ? 'bg-gradient-to-br from-red-500 to-red-700 animate-recording-item-pulse' 
             : 'bg-camera-element'
@@ -69,7 +69,7 @@
         </div>
       </div>
       
-      <div class="flex items-center justify-between bg-camera-element p-4 rounded-lg">
+      <div class="flex items-center justify-between bg-camera-element p-3 rounded-lg">
         <div class="text-sm font-medium text-gray-300">Timecode</div>
         <div class="text-lg font-semibold text-camera-orange">
           {{ camera.timecode || '00:00:00:00' }}
@@ -79,7 +79,7 @@
 
     <!-- Format Information -->
     <div class="space-y-3">
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-2 gap-2">
         <div class="flex items-center justify-between bg-camera-element p-3 rounded-lg">
           <div class="text-sm font-medium text-gray-300">Codec</div>
           <div class="text-sm font-semibold text-camera-orange">
@@ -104,7 +104,7 @@
         <div class="flex items-center justify-between bg-camera-element p-3 rounded-lg">
           <div class="text-sm font-medium text-gray-300">Device Name</div>
           <div class="text-sm font-semibold text-camera-orange">
-            {{ camera.deviceName || 'Connecting...' }}
+            {{ camera.deviceName || 'Unknown...' }}
           </div>
         </div>
       </div>

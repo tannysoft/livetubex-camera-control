@@ -2,6 +2,9 @@ import { defineStore } from 'pinia'
 import { ref, reactive } from 'vue'
 
 export const useCameraStore = defineStore('camera', () => {
+  // Global auto restart setting
+  const globalAutoRestartEnabled = ref(true)
+  
   // Camera configurations
   const cameras = reactive({
     cam1: {
@@ -98,6 +101,19 @@ export const useCameraStore = defineStore('camera', () => {
     cam11: {
       id: 'cam11',
       ip: '192.168.8.81',
+      connected: false,
+      recording: false,
+      manualStop: false,
+      ws: null,
+      propertyData: {},
+      availableProperties: [],
+      timecode: '00:00:00:00',
+      format: {},
+      deviceName: ''
+    },
+    cam12: {
+      id: 'cam12',
+      ip: '192.168.8.212',
       connected: false,
       recording: false,
       manualStop: false,
@@ -250,12 +266,12 @@ export const useCameraStore = defineStore('camera', () => {
         const wasRecording = camera.recording
         camera.recording = recordData.recording
         
-        // Auto-restart recording if it was stopped (but not manually)
+        // Auto-restart recording if it was stopped (but not manually) and auto restart is enabled
         if (wasRecording && !camera.recording && !camera.manualStop) {
-          console.log(`🔄 Auto-restarting recording for ${cameraId} (not manually stopped)`)
+          console.log(`🔄 Auto-restarting recording for ${cameraId} (auto restart enabled)`)
           startRecording(cameraId)
         } else if (wasRecording && !camera.recording && camera.manualStop) {
-          console.log(`⏹️ Recording stopped for ${cameraId} - NO auto-restart (manual stop)`)
+          console.log(`⏹️ Recording stopped for ${cameraId} - NO auto-restart (manual stop or auto restart disabled)`)
         }
       }
     }
@@ -299,12 +315,12 @@ export const useCameraStore = defineStore('camera', () => {
           const wasRecording = camera.recording
           camera.recording = data.recording
           
-          // Auto-restart recording if it was stopped (but not manually)
+          // Auto-restart recording if it was stopped (but not manually) and auto restart is enabled
           if (wasRecording && !camera.recording && !camera.manualStop) {
-            console.log(`🔄 Auto-restarting recording for ${cameraId} (HTTP fallback - not manually stopped)`)
+            console.log(`🔄 Auto-restarting recording for ${cameraId} (HTTP fallback - auto restart enabled)`)
             startRecording(cameraId)
           } else if (wasRecording && !camera.recording && camera.manualStop) {
-            console.log(`⏹️ Recording stopped for ${cameraId} (HTTP fallback) - NO auto-restart (manual stop)`)
+            console.log(`⏹️ Recording stopped for ${cameraId} (HTTP fallback) - NO auto-restart (manual stop or auto restart disabled)`)
           }
         }
       }
@@ -545,6 +561,30 @@ export const useCameraStore = defineStore('camera', () => {
     }
   }
 
+  // Set global auto restart setting
+  const setGlobalAutoRestart = (enabled) => {
+    globalAutoRestartEnabled.value = enabled
+    console.log(`Global auto restart ${enabled ? 'ENABLED' : 'DISABLED'}`)
+    
+    // Update all cameras' manualStop flag based on global setting
+    Object.keys(cameras).forEach(cameraId => {
+      if (enabled) {
+        // Enable auto restart - reset manualStop flag
+        cameras[cameraId].manualStop = false
+        console.log(`Camera ${cameraId} auto restart enabled`)
+      } else {
+        // Disable auto restart - set manualStop flag to prevent auto restart
+        cameras[cameraId].manualStop = true
+        console.log(`Camera ${cameraId} auto restart disabled`)
+      }
+    })
+  }
+
+  // Get global auto restart status
+  const getGlobalAutoRestart = () => {
+    return globalAutoRestartEnabled.value
+  }
+
   // Initialize all cameras
   const initializeCameras = () => {
     Object.keys(cameras).forEach(cameraId => {
@@ -581,9 +621,12 @@ export const useCameraStore = defineStore('camera', () => {
   return {
     cameras,
     toggleRecording,
+    startRecording,
     stopRecording,
     initializeCameras,
     cleanup,
-    resetManualStop
+    resetManualStop,
+    setGlobalAutoRestart,
+    getGlobalAutoRestart
   }
 }) 
