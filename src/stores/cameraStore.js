@@ -9,7 +9,7 @@ export const useCameraStore = defineStore('camera', () => {
   const cameras = reactive({
     cam1: {
       id: 'cam1',
-      ip: '192.168.8.201',
+      ip: import.meta.env.VITE_CAM1_IP || '192.168.10.101',
       connected: false,
       recording: false,
       manualStop: false,
@@ -22,7 +22,7 @@ export const useCameraStore = defineStore('camera', () => {
     },
     cam2: {
       id: 'cam2',
-      ip: '192.168.8.202',
+      ip: import.meta.env.VITE_CAM2_IP || '192.168.10.102',
       connected: false,
       recording: false,
       manualStop: false,
@@ -35,7 +35,7 @@ export const useCameraStore = defineStore('camera', () => {
     },
     cam3: {
       id: 'cam3',
-      ip: '192.168.8.203',
+      ip: import.meta.env.VITE_CAM3_IP || '192.168.10.103',
       connected: false,
       recording: false,
       manualStop: false,
@@ -48,7 +48,7 @@ export const useCameraStore = defineStore('camera', () => {
     },
     cam4: {
       id: 'cam4',
-      ip: '192.168.8.204',
+      ip: import.meta.env.VITE_CAM4_IP || '192.168.10.104',
       connected: false,
       recording: false,
       manualStop: false,
@@ -61,7 +61,7 @@ export const useCameraStore = defineStore('camera', () => {
     },
     cam5: {
       id: 'cam5',
-      ip: '192.168.8.205',
+      ip: import.meta.env.VITE_CAM5_IP || '192.168.10.105',
       connected: false,
       recording: false,
       manualStop: false,
@@ -74,7 +74,7 @@ export const useCameraStore = defineStore('camera', () => {
     },
     cam6: {
       id: 'cam6',
-      ip: '192.168.8.206',
+      ip: import.meta.env.VITE_CAM6_IP || '192.168.10.106',
       connected: false,
       recording: false,
       manualStop: false,
@@ -87,7 +87,7 @@ export const useCameraStore = defineStore('camera', () => {
     },
     cam7: {
       id: 'cam7',
-      ip: '192.168.8.207',
+      ip: import.meta.env.VITE_CAM7_IP || '192.168.10.107',
       connected: false,
       recording: false,
       manualStop: false,
@@ -98,32 +98,6 @@ export const useCameraStore = defineStore('camera', () => {
       format: {},
       deviceName: ''
     },
-    cam11: {
-      id: 'cam11',
-      ip: '192.168.8.81',
-      connected: false,
-      recording: false,
-      manualStop: false,
-      ws: null,
-      propertyData: {},
-      availableProperties: [],
-      timecode: '00:00:00:00',
-      format: {},
-      deviceName: ''
-    },
-    cam12: {
-      id: 'cam12',
-      ip: '192.168.8.212',
-      connected: false,
-      recording: false,
-      manualStop: false,
-      ws: null,
-      propertyData: {},
-      availableProperties: [],
-      timecode: '00:00:00:00',
-      format: {},
-      deviceName: ''
-    }
   })
 
   // Initialize WebSocket connection for a camera

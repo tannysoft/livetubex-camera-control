@@ -104,20 +104,7 @@
           @toggle-recording="handleToggleRecording"
           @stop-recording="handleStopRecording"
         />
-        
-        <!-- Camera 11 -->
-        <CameraCard 
-          :camera="cameras.cam11" 
-          @toggle-recording="handleToggleRecording"
-          @stop-recording="handleStopRecording"
-        />
-        
-        <!-- Camera 12 -->
-        <CameraCard 
-          :camera="cameras.cam12" 
-          @toggle-recording="handleToggleRecording"
-          @stop-recording="handleStopRecording"
-        />
+
       </div>
     </div>
   </div>
