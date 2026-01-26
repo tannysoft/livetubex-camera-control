@@ -55,7 +55,7 @@
         </div>
       </div>
       
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Camera 1 -->
         <CameraCard 
           :camera="cameras.cam1" 
@@ -84,23 +84,9 @@
           @stop-recording="handleStopRecording"
         />
         
-        <!-- Camera 5 -->
+        <!-- Camera 9 -->
         <CameraCard 
-          :camera="cameras.cam5" 
-          @toggle-recording="handleToggleRecording"
-          @stop-recording="handleStopRecording"
-        />
-        
-        <!-- Camera 6 -->
-        <CameraCard 
-          :camera="cameras.cam6" 
-          @toggle-recording="handleToggleRecording"
-          @stop-recording="handleStopRecording"
-        />
-        
-        <!-- Camera 7 -->
-        <CameraCard 
-          :camera="cameras.cam7" 
+          :camera="cameras.cam9" 
           @toggle-recording="handleToggleRecording"
           @stop-recording="handleStopRecording"
         />

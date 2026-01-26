@@ -2,7 +2,7 @@
 const cameras = {
     camera1: {
         id: 'camera1',
-        ip: '192.168.8.201',
+        ip: '192.168.10.101',
         connected: false,
         recording: false,
         manualStop: false,
@@ -24,7 +24,7 @@ const cameras = {
     },
     camera2: {
         id: 'camera2',
-        ip: '192.168.8.202',
+        ip: '192.168.10.102',
         connected: false,
         recording: false,
         manualStop: false,
@@ -46,7 +46,7 @@ const cameras = {
     },
     camera3: {
         id: 'camera3',
-        ip: '192.168.8.203',
+        ip: '192.168.10.103',
         connected: false,
         recording: false,
         manualStop: false,
@@ -68,7 +68,7 @@ const cameras = {
     },
     camera5: {
         id: 'camera5',
-        ip: '192.168.8.205',
+        ip: '192.168.10.104',
         connected: false,
         recording: false,
         manualStop: false,
