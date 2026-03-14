@@ -5,6 +5,7 @@ export const useCameraStore = defineStore('camera', () => {
   const globalAutoRestartEnabled = ref(true)
 
   const cameras = reactive({})
+  const cameraOrder = ref([]) // array of camera IDs in display order
 
   const initializeWebSocket = (cameraId) => {
     if (!process.client) return
@@ -288,6 +289,7 @@ export const useCameraStore = defineStore('camera', () => {
       Object.keys(cameras).forEach((key) => {
         delete cameras[key]
       })
+      cameraOrder.value = []
       data.forEach((cfg) => {
         if (!cfg || !cfg.id || !cfg.ip) return
         cameras[cfg.id] = {
@@ -304,6 +306,7 @@ export const useCameraStore = defineStore('camera', () => {
           deviceName: '',
           power: { source: '', milliVolt: null, batteries: [] }
         }
+        cameraOrder.value.push(cfg.id)
       })
     } catch {
     }
@@ -311,9 +314,11 @@ export const useCameraStore = defineStore('camera', () => {
 
   const saveCameraConfigs = async () => {
     try {
-      const payload = Object.values(cameras).map(cam => ({
-        id: cam.id,
-        ip: cam.ip
+      const order = cameraOrder.value.filter(id => cameras[id])
+      const payload = order.map((id, i) => ({
+        id: cameras[id].id,
+        ip: cameras[id].ip,
+        sort_order: i + 1
       }))
 
       await fetch('/api/cameras', {
@@ -323,6 +328,11 @@ export const useCameraStore = defineStore('camera', () => {
       })
     } catch {
     }
+  }
+
+  const reorderCameras = async (newOrderIds) => {
+    cameraOrder.value = newOrderIds
+    await saveCameraConfigs()
   }
 
   const addCameraConfig = async (id, ip) => {
@@ -343,6 +353,7 @@ export const useCameraStore = defineStore('camera', () => {
         deviceName: '',
         power: { source: '', milliVolt: null, batteries: [] }
       }
+      cameraOrder.value.push(id)
     } else {
       cameras[id].ip = ip
     }
@@ -369,12 +380,14 @@ export const useCameraStore = defineStore('camera', () => {
     }
 
     delete cameras[id]
+    cameraOrder.value = cameraOrder.value.filter(cid => cid !== id)
 
     await saveCameraConfigs()
   }
 
   return {
     cameras,
+    cameraOrder,
     toggleRecording,
     startRecording,
     stopRecording,
@@ -385,6 +398,7 @@ export const useCameraStore = defineStore('camera', () => {
     getGlobalAutoRestart,
     loadCameraConfigs,
     saveCameraConfigs,
+    reorderCameras,
     addCameraConfig,
     removeCameraConfig
   }

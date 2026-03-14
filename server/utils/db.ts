@@ -17,13 +17,29 @@ export const getDb = () => {
     db.prepare(`
       CREATE TABLE IF NOT EXISTS cameras (
         id TEXT PRIMARY KEY,
-        ip TEXT NOT NULL
+        ip TEXT NOT NULL,
+        sort_order INTEGER DEFAULT 0
       )
     `).run()
 
+    // Migration: add sort_order column if it doesn't exist
+    try {
+      db.prepare('ALTER TABLE cameras ADD COLUMN sort_order INTEGER DEFAULT 0').run()
+    } catch { /* column already exists */ }
+
+    // Assign sort_order to existing rows that have none
+    const unordered = db.prepare('SELECT id FROM cameras WHERE sort_order = 0').all() as { id: string }[]
+    if (unordered.length > 0) {
+      const allRows = db.prepare('SELECT id FROM cameras ORDER BY rowid ASC').all() as { id: string }[]
+      const updateOrder = db.prepare('UPDATE cameras SET sort_order = @order WHERE id = @id')
+      db.transaction(() => {
+        allRows.forEach((r, i) => updateOrder.run({ order: i + 1, id: r.id }))
+      })()
+    }
+
     const row = db.prepare('SELECT COUNT(*) as count FROM cameras').get() as { count: number }
     if (!row || row.count === 0) {
-      const insertStmt = db.prepare('INSERT INTO cameras (id, ip) VALUES (@id, @ip)')
+      const insertStmt = db.prepare('INSERT INTO cameras (id, ip, sort_order) VALUES (@id, @ip, @sort_order)')
       const seed = [
         { id: 'cam1', ip: '192.168.110.201' },
         { id: 'cam2', ip: '192.168.110.202' },
@@ -44,7 +60,7 @@ export const getDb = () => {
       ]
 
       const insertMany = db.transaction((rows: { id: string; ip: string }[]) => {
-        rows.forEach(row => insertStmt.run(row))
+        rows.forEach((row, i) => insertStmt.run({ ...row, sort_order: i + 1 }))
       })
 
       insertMany(seed)

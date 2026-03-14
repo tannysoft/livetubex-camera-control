@@ -21,7 +21,7 @@ export default {
       },
       animation: {
         'recording-pulse': 'recording-pulse 1.5s infinite',
-        'recording-gradient': 'recording-gradient 2s infinite',
+        'recording-gradient': 'recording-gradient 3s linear infinite',
         'recording-item-pulse': 'recording-item-pulse 2s infinite'
       },
       keyframes: {
