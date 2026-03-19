@@ -96,7 +96,9 @@ export const useCameraStore = defineStore('camera', () => {
       '/transports/0/timecode',
       '/system/format',
       '/media/active',
-      '/camera/power'
+      '/camera/power',
+      '/video/ndFilter',
+      '/camera/colorBars'
     ]
 
     relevantProperties.forEach(property => {
@@ -110,6 +112,76 @@ export const useCameraStore = defineStore('camera', () => {
         }))
       }
     })
+
+    // Fetch device product (softwareVersion = firmware)
+    fetch(`http://${camera.ip}/control/api/v1/system/product`, { method: 'GET' })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && camera) {
+          camera.firmwareVersion = data.softwareVersion ?? ''
+        }
+      })
+      .catch(() => {})
+
+    // Fetch power once in case device doesn't push it via websocket
+    fetch(`http://${camera.ip}/control/api/v1/camera/power`, { method: 'GET' })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data && camera) {
+          camera.power = {
+            source: data.source || '',
+            milliVolt: data.milliVolt ?? null,
+            batteries: Array.isArray(data.batteries) ? data.batteries : []
+          }
+        }
+      })
+      .catch(() => {})
+
+    // Fetch monitoring display list; prefer "Main SDI" if present, else first display
+    fetch(`http://${camera.ip}/control/api/v1/monitoring/display`, { method: 'GET' })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (!data?.displays?.length || !camera) return
+        const list = data.displays
+        const mainSdi = list.find(d => {
+          const lower = String(d).toLowerCase()
+          return lower.includes('main') && lower.includes('sdi')
+        })
+        const displayName = mainSdi ?? list[0]
+        camera.monitoringDisplayName = displayName
+        const encoded = encodeURIComponent(displayName)
+        return fetch(`http://${camera.ip}/control/api/v1/monitoring/${encoded}/displayLUT`, { method: 'GET' })
+      })
+      .then(res => (res && res.ok ? res.json() : null))
+      .then(data => {
+        if (data && typeof data.enabled === 'boolean' && camera) {
+          camera.displayLUTEnabled = data.enabled
+        }
+      })
+      .catch(() => {})
+
+    // GET /video/ndFilter → stop (fStop). 501 = not implemented for device
+    fetch(`http://${camera.ip}/control/api/v1/video/ndFilter`, { method: 'GET' })
+      .then(res => {
+        if (res.status === 501) return null
+        return res.ok ? res.json() : null
+      })
+      .then(data => {
+        if (data && camera && typeof data.stop === 'number') {
+          camera.ndFilterStop = data.stop
+        }
+      })
+      .catch(() => {})
+
+    // GET /camera/colorBars → enabled
+    fetch(`http://${camera.ip}/control/api/v1/camera/colorBars`, { method: 'GET' })
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => {
+        if (data && camera && typeof data.enabled === 'boolean') {
+          camera.colorBarsEnabled = data.enabled
+        }
+      })
+      .catch(() => {})
   }
 
   const updateUIFromPropertyData = (cameraId) => {
@@ -157,6 +229,12 @@ export const useCameraStore = defineStore('camera', () => {
         milliVolt: powerData.milliVolt ?? null,
         batteries: Array.isArray(powerData.batteries) ? powerData.batteries : []
       }
+    }
+    if (camera.propertyData['/video/ndFilter'] != null && typeof camera.propertyData['/video/ndFilter'].stop === 'number') {
+      camera.ndFilterStop = camera.propertyData['/video/ndFilter'].stop
+    }
+    if (camera.propertyData['/camera/colorBars'] != null && typeof camera.propertyData['/camera/colorBars'].enabled === 'boolean') {
+      camera.colorBarsEnabled = camera.propertyData['/camera/colorBars'].enabled
     }
   }
 
@@ -240,6 +318,39 @@ export const useCameraStore = defineStore('camera', () => {
     }
   }
 
+  const setDisplayLUT = async (cameraId, enabled) => {
+    const camera = cameras[cameraId]
+    if (!camera || !camera.connected || !camera.monitoringDisplayName) return
+    const encoded = encodeURIComponent(camera.monitoringDisplayName)
+    try {
+      const res = await fetch(`http://${camera.ip}/control/api/v1/monitoring/${encoded}/displayLUT`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ enabled: !!enabled })
+      })
+      if (res.ok) {
+        camera.displayLUTEnabled = !!enabled
+      }
+    } catch {
+    }
+  }
+
+  const setColorBars = async (cameraId, enabled) => {
+    const camera = cameras[cameraId]
+    if (!camera || !camera.connected) return
+    try {
+      const res = await fetch(`http://${camera.ip}/control/api/v1/camera/colorBars`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ enabled: !!enabled })
+      })
+      if (res.ok) {
+        camera.colorBarsEnabled = !!enabled
+      }
+    } catch {
+    }
+  }
+
   const setGlobalAutoRestart = (enabled) => {
     globalAutoRestartEnabled.value = enabled
 
@@ -304,7 +415,12 @@ export const useCameraStore = defineStore('camera', () => {
           timecode: '00:00:00:00',
           format: {},
           deviceName: '',
-          power: { source: '', milliVolt: null, batteries: [] }
+          firmwareVersion: '',
+          power: { source: '', milliVolt: null, batteries: [] },
+          monitoringDisplayName: '',
+          displayLUTEnabled: false,
+          ndFilterStop: null,
+          colorBarsEnabled: false
         }
         cameraOrder.value.push(cfg.id)
       })
@@ -351,7 +467,12 @@ export const useCameraStore = defineStore('camera', () => {
         timecode: '00:00:00:00',
         format: {},
         deviceName: '',
-        power: { source: '', milliVolt: null, batteries: [] }
+        firmwareVersion: '',
+        power: { source: '', milliVolt: null, batteries: [] },
+        monitoringDisplayName: '',
+        displayLUTEnabled: false,
+        ndFilterStop: null,
+        colorBarsEnabled: false
       }
       cameraOrder.value.push(id)
     } else {
@@ -391,6 +512,8 @@ export const useCameraStore = defineStore('camera', () => {
     toggleRecording,
     startRecording,
     stopRecording,
+    setDisplayLUT,
+    setColorBars,
     initializeCameras,
     cleanup,
     resetManualStop,

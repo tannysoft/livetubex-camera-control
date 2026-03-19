@@ -22,7 +22,8 @@ export default {
       animation: {
         'recording-pulse': 'recording-pulse 1.5s infinite',
         'recording-gradient': 'recording-gradient 3s linear infinite',
-        'recording-item-pulse': 'recording-item-pulse 2s infinite'
+        'recording-item-pulse': 'recording-item-pulse 2s infinite',
+        'recording-border': 'recording-border 2s linear infinite'
       },
       keyframes: {
         'recording-pulse': {
@@ -39,6 +40,10 @@ export default {
           '0%': { transform: 'scale(1.02)' },
           '50%': { transform: 'scale(1.03)' },
           '100%': { transform: 'scale(1.02)' }
+        },
+        'recording-border': {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' }
         }
       }
     },

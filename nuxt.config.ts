@@ -1,4 +1,5 @@
 import { defineNuxtConfig } from 'nuxt/config'
+import { resolve } from 'node:path'
 
 export default defineNuxtConfig({
   ssr: false,
@@ -13,6 +14,14 @@ export default defineNuxtConfig({
   },
   nitro: {
     preset: 'node-server'
+  },
+  vite: {
+    resolve: {
+      alias: {
+        // Workaround for Vite pre-transform trying to resolve Nuxt virtual module `#app-manifest`
+        '#app-manifest': resolve(__dirname, 'app/app-manifest-stub')
+      }
+    }
   }
 })
 

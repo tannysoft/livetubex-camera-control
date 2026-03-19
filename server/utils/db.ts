@@ -2,7 +2,7 @@ import Database from 'better-sqlite3'
 import { join, dirname } from 'node:path'
 import { existsSync, mkdirSync } from 'node:fs'
 
-let db: Database.Database | null = null
+let db: Database | null = null
 
 export const getDb = () => {
   if (!db) {
@@ -35,6 +35,27 @@ export const getDb = () => {
       db.transaction(() => {
         allRows.forEach((r, i) => updateOrder.run({ order: i + 1, id: r.id }))
       })()
+    }
+
+    db.prepare(`
+      CREATE TABLE IF NOT EXISTS hyperdecks (
+        id TEXT PRIMARY KEY,
+        ip TEXT NOT NULL,
+        sort_order INTEGER DEFAULT 0
+      )
+    `).run()
+
+    // Seed hyperdecks if empty
+    const hyperdeckRow = db.prepare('SELECT COUNT(*) as count FROM hyperdecks').get() as { count: number }
+    if (!hyperdeckRow || hyperdeckRow.count === 0) {
+      const insertHyperdeck = db.prepare('INSERT INTO hyperdecks (id, ip, sort_order) VALUES (@id, @ip, @sort_order)')
+      const hyperdeckSeed = [
+        { id: 'hd1', ip: '192.168.1.100' },
+        { id: 'hd2', ip: '192.168.1.101' }
+      ]
+      db.transaction((rows: { id: string; ip: string }[]) => {
+        rows.forEach((row, i) => insertHyperdeck.run({ ...row, sort_order: i + 1 }))
+      })(hyperdeckSeed)
     }
 
     const row = db.prepare('SELECT COUNT(*) as count FROM cameras').get() as { count: number }
