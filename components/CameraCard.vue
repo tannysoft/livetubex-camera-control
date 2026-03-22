@@ -307,7 +307,7 @@ const batteryClass = computed(() => {
   const critical = flags.some(f => f && f.includes('Critically'))
   const low = flags.some(f => f && f.includes('Low'))
   if (critical || (pct != null && pct <= 10)) return 'text-red-400'
-  if (low || (pct != null && pct <= 25)) return 'text-amber-400'
+  if (low || (pct != null && pct < 50)) return 'text-amber-400'
   return 'text-emerald-400'
 })
 
